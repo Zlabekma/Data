@@ -12,13 +12,16 @@ from datetime import datetime
 app = Dash(__name__)
 
 # Define the scope for Google Sheets API
-scope = ["https://spreadsheets.google.com/feeds",
-         "https://www.googleapis.com/auth/spreadsheets",
-         "https://www.googleapis.com/auth/drive.file",
-         "https://www.googleapis.com/auth/drive"]
+#scope = ["https://spreadsheets.google.com/feeds",
+#         "https://www.googleapis.com/auth/spreadsheets",
+#         "https://www.googleapis.com/auth/drive.file",
+#         "https://www.googleapis.com/auth/drive"]
 
 # Authenticate Google Sheets client
-credentials = ServiceAccountCredentials.from_json_keyfile_name("bowling-440309-db098bc08118.json", scope)
+#credentials = ServiceAccountCredentials.from_json_keyfile_name("bowling-440309-db098bc08118.json", scope)
+#client = gspread.authorize(credentials)
+google_sheets_key = os.getenv("GOOGLE_SHEETS_KEY")
+credentials = ServiceAccountCredentials.from_json_keyfile_dict(json.loads(google_sheets_key), scope)
 client = gspread.authorize(credentials)
 
 # Load data from Google Sheets
