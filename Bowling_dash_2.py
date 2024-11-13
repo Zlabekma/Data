@@ -6,6 +6,10 @@ import plotly.colors
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from datetime import datetime
+import os
+
+os.environ.pop('PYTHONHOME', None)
+os.environ.pop('PYTHONPATH', None)
 
 
 # Initialize the Dash app
