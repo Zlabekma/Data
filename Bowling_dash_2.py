@@ -23,10 +23,12 @@ scope = ["https://spreadsheets.google.com/feeds",
          "https://www.googleapis.com/auth/drive"]
 
 # Authenticate Google Sheets client
-#credentials = ServiceAccountCredentials.from_json_keyfile_name("bowling-440309-db098bc08118.json", scope)
-#client = gspread.authorize(credentials)
-#google_sheets_key = os.getenv("GOOGLE_SHEETS_KEY")
-credentials = ServiceAccountCredentials.from_json_keyfile_name("GOOGLE_SHEETS_KEY.json", scope)
+
+# local credentials = ServiceAccountCredentials.from_json_keyfile_name("GOOGLE_SHEETS_KEY.json", scope)
+# non local 
+credentials = ServiceAccountCredentials.from_json_keyfile_name("/etc/secrets/GOOGLE_SHEETS_KEY.json", scope)
+
+
 client = gspread.authorize(credentials)
 
 # Load data from Google Sheets
