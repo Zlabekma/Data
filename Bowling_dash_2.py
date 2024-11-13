@@ -6,11 +6,6 @@ import plotly.colors
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from datetime import datetime
-import os
-
-
-os.environ.pop('PYTHONHOME', None)
-os.environ.pop('PYTHONPATH', None)
 
 
 # Initialize the Dash app
@@ -26,10 +21,20 @@ scope = ["https://spreadsheets.google.com/feeds",
 
 # local credentials = ServiceAccountCredentials.from_json_keyfile_name("GOOGLE_SHEETS_KEY.json", scope)
 # non local 
-credentials = ServiceAccountCredentials.from_json_keyfile_name("/etc/secrets/GOOGLE_SHEETS_KEY.json", scope)
+
+import os
+
+# Check if the /etc/secrets directory exists
+if os.path.exists("/etc/secrets/"):
+    # Print all files in /etc/secrets
+    print("Contents of /etc/secrets/:", os.listdir("/etc/secrets/"))
+else:
+    print("/etc/secrets/ directory not found.")
 
 
+credentials = ServiceAccountCredentials.from_json_keyfile_name('/etc/secrets/GOOGLE_SHEETS_KEY.JSON', scope)
 client = gspread.authorize(credentials)
+
 
 # Load data from Google Sheets
 spreadsheet = client.open("Bowling-liga")
