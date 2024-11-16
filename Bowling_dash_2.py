@@ -6,6 +6,7 @@ import plotly.colors
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from datetime import datetime
+import os
 
 
 # Initialize the Dash app
@@ -21,6 +22,7 @@ scope = ["https://spreadsheets.google.com/feeds",
 
 #credentials = ServiceAccountCredentials.from_json_keyfile_name("GOOGLE_SHEETS_KEY.JSON", scope)
 # non local 
+
 
 
 credentials = ServiceAccountCredentials.from_json_keyfile_name('/etc/secrets/GOOGLE_SHEETS_KEY.JSON', scope)
