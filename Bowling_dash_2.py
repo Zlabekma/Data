@@ -19,17 +19,8 @@ scope = ["https://spreadsheets.google.com/feeds",
 
 # Authenticate Google Sheets client
 
-# local credentials = ServiceAccountCredentials.from_json_keyfile_name("GOOGLE_SHEETS_KEY.json", scope)
+#credentials = ServiceAccountCredentials.from_json_keyfile_name("GOOGLE_SHEETS_KEY.JSON", scope)
 # non local 
-
-import os
-
-# Check if the /etc/secrets directory exists
-if os.path.exists("/etc/secrets/"):
-    # Print all files in /etc/secrets
-    print("Contents of /etc/secrets/:", os.listdir("/etc/secrets/"))
-else:
-    print("/etc/secrets/ directory not found.")
 
 
 credentials = ServiceAccountCredentials.from_json_keyfile_name('/etc/secrets/GOOGLE_SHEETS_KEY.JSON', scope)
@@ -173,15 +164,15 @@ app.layout = html.Div([
 def display_graphs(tab, selected_player):
     if tab == 'Player' and selected_player:
         return [
-            dcc.Graph(id='strikes-evolution-plot', figure=generate_strikes_evolution_plot(selected_player), style={'width': '48%'}),
-            dcc.Graph(id='position-over-time-plot', figure=generate_position_over_time_plot(selected_player), style={'width': '48%'}),
-            dcc.Graph(id='spares-evolution-plot', figure=generate_spares_evolution_plot(selected_player), style={'width': '48%'}),
+            dcc.Graph(id='strikes-spare-evolution-plot', figure=generate_combined_strikes_and_spares_evolution_plot(selected_player), style={'width': '48%'}),
+            dcc.Graph(id='position-over-time-plot', figure=generate_player_score_dist(selected_player, 10), style={'width': '48%'}),
+            dcc.Graph(id='spares-evolution-plot', figure=generate_position_over_time_plot(selected_player), style={'width': '48%'}),
             dcc.Graph(id='round-distribution-plot', figure=generate_round_distribution_plot(selected_player), style={'width': '48%'})
         ]
     elif tab == 'Team':
         return [
-            dcc.Graph(id='cumulative-score-plot', figure=generate_total_score_dist, style={'width': '48%'}),
             dcc.Graph(id='absolute-game-score-plot', figure=generate_absolute_game_score_plot(color_dict), style={'width': '48%'}),
+            dcc.Graph(id='total_total_score_dist', figure=generate_total_score_dist(10), style={'width': '48%'}),
             dcc.Graph(id='avg-min-max-plot', figure=generate_avg_min_max_plot(), style={'width': '48%'}),
             dcc.Graph(id='result-distribution-pie', figure=generate_result_distribution_pie(), style={'width': '48%'})
         ]
@@ -234,13 +225,12 @@ def generate_cumulative_score_plot(color_dict):
     return fig
 
 
-def generate_total_score_dist():
-    binsize = 10;
-    start = int(df['Skóre 10. kolo'].min())
-    end = int(df['Skóre 10. kolo'].max()) + binsize
+def generate_total_score_dist(binsize):
+    start = int(df['Skóre 10. kolo'].min());
+    end = int(df['Skóre 10. kolo'].max()) + binsize;
 
     # Create bin labels
-    bin_labels = [f"{i}-{i+binsize-1}" for i in range(start, end, binsize)]
+    bin_labels = [f"{i}-{i+binsize-1}" for i in range(start, end, binsize)];
 
     fig = go.Figure(data=[go.Histogram(
         x=df['Skóre 10. kolo'],
@@ -336,6 +326,74 @@ def generate_result_distribution_pie():
     )
     return fig
 
+
+
+def generate_combined_strikes_and_spares_evolution_plot(player):
+    df_player = df[df['Hráč'] == player]
+    strike_columns_all = [col for col in df_player.columns if 'kolo' in col and 'Skóre' not in col]
+    
+    # Calculate total strikes
+    df_player['Total_Strikes'] = df_player[strike_columns_all].apply(lambda x: (x == 'Strike').sum(), axis=1)
+    
+    # Calculate total spares
+    df_player['Total_Spares'] = df_player[strike_columns_all].apply(lambda x: (x == 'Spare').sum(), axis=1)
+    
+    # Create a combined figure
+    fig = go.Figure()
+    
+    # Add strikes trace
+    fig.add_trace(go.Scatter(x=df_player['absolute_game_position'], y=df_player['Total_Strikes'],
+                             mode='lines+markers', name='Strikes Over Time'))
+    
+    # Add spares trace
+    fig.add_trace(go.Scatter(x=df_player['absolute_game_position'], y=df_player['Total_Spares'],
+                             mode='lines+markers', name='Spares Over Time'))
+    
+    # Update layout
+    fig.update_layout(title=f'Evolution of Strikes and Spares Over Time for Player {player}',
+                      xaxis_title='Absolute Game Position',
+                      yaxis_title='Number of Strikes/Spares',
+                      template='plotly_white')
+    
+    return fig
+
+def generate_player_score_dist(player, binsize):
+    # Filter the DataFrame for the specific player
+    df_player = df[df['Hráč'] == player]
+    
+    start = int(df_player['Skóre 10. kolo'].min())
+    end = int(df_player['Skóre 10. kolo'].max()) + binsize
+
+    # Create bin labels
+    bin_labels = [f"{i}-{i+binsize-1}" for i in range(start, end, binsize)]
+
+    fig = go.Figure(data=[go.Histogram(
+        x=df_player['Skóre 10. kolo'],
+        xbins=dict(
+            start=start,
+            end=end,
+            size=binsize
+        ),
+        marker_color='blue',
+        marker_line_color='black',
+        marker_line_width=1
+    )])
+
+    fig.update_layout(
+        title=f'Scores Distribution for Player {player}',
+        xaxis_title='Score Ranges',
+        yaxis_title='Frequency',
+        xaxis=dict(
+            tickmode='array',
+            tickvals=[i + binsize / 2 for i in range(start, end, binsize)],
+            ticktext=bin_labels
+        )
+    )
+    return fig
+
+
+
+
 # Graph generation functions for individual players
 def generate_round_distribution_plot(player):
     df_player = df[df['Hráč'] == player]
@@ -392,3 +450,6 @@ def toggle_player_dropdown(filter_value):
 
 if __name__ == "__main__":
     app.run_server(host="0.0.0.0", port=int(os.environ.get("PORT", 8080)), debug=True)
+
+#if __name__ == '__main__':
+#    app.run_server(debug=True)
