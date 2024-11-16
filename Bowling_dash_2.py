@@ -19,7 +19,8 @@ scope = ["https://spreadsheets.google.com/feeds",
 
 # Authenticate Google Sheets client
 
-# local credentials = ServiceAccountCredentials.from_json_keyfile_name("GOOGLE_SHEETS_KEY.json", scope)
+# local 
+credentials = ServiceAccountCredentials.from_json_keyfile_name("GOOGLE_SHEETS_KEY.json", scope)
 # non local 
 
 import os
@@ -32,7 +33,7 @@ else:
     print("/etc/secrets/ directory not found.")
 
 
-credentials = ServiceAccountCredentials.from_json_keyfile_name('/etc/secrets/GOOGLE_SHEETS_KEY.JSON', scope)
+#credentials = ServiceAccountCredentials.from_json_keyfile_name('/etc/secrets/GOOGLE_SHEETS_KEY.JSON', scope)
 client = gspread.authorize(credentials)
 
 
