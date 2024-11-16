@@ -180,7 +180,7 @@ def display_graphs(tab, selected_player):
         ]
     elif tab == 'Team':
         return [
-            dcc.Graph(id='cumulative-score-plot', figure=generate_cumulative_score_plot(color_dict), style={'width': '48%'}),
+            dcc.Graph(id='cumulative-score-plot', figure=generate_total_score_dist(color_dict), style={'width': '48%'}),
             dcc.Graph(id='absolute-game-score-plot', figure=generate_absolute_game_score_plot(color_dict), style={'width': '48%'}),
             dcc.Graph(id='avg-min-max-plot', figure=generate_avg_min_max_plot(), style={'width': '48%'}),
             dcc.Graph(id='result-distribution-pie', figure=generate_result_distribution_pie(), style={'width': '48%'})
@@ -230,6 +230,39 @@ def generate_cumulative_score_plot(color_dict):
         xaxis_title="Game Order (Pořadové č. hry)",
         yaxis_title="Average Score",
         legend_title="Player"
+    )
+    return fig
+
+
+def generate_total_score_dist():
+    binsize = 10;
+    start = int(df['Skóre 10. kolo'].min())
+    end = int(df['Skóre 10. kolo'].max()) + binsize
+
+    # Create bin labels
+    bin_labels = [f"{i}-{i+binsize-1}" for i in range(start, end, binsize)]
+
+    fig = go.Figure(data=[go.Histogram(
+        x=df['Skóre 10. kolo'],
+        xbins=dict(
+            start=start,
+            end=end,
+            size=binsize
+        ),
+        marker_color='blue',
+        marker_line_color='black',
+        marker_line_width=1
+    )])
+
+    fig.update_layout(
+        title='Scores Distribution',
+        xaxis_title='Score Ranges',
+        yaxis_title='Frequency',
+        xaxis=dict(
+            tickmode='array',
+            tickvals=[i + binsize / 2 for i in range(start, end, binsize)],
+            ticktext=bin_labels
+        )
     )
     return fig
 
