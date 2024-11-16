@@ -180,7 +180,7 @@ def display_graphs(tab, selected_player):
         ]
     elif tab == 'Team':
         return [
-            dcc.Graph(id='cumulative-score-plot', figure=generate_total_score_dist(color_dict), style={'width': '48%'}),
+            dcc.Graph(id='cumulative-score-plot', figure=generate_total_score_dist, style={'width': '48%'}),
             dcc.Graph(id='absolute-game-score-plot', figure=generate_absolute_game_score_plot(color_dict), style={'width': '48%'}),
             dcc.Graph(id='avg-min-max-plot', figure=generate_avg_min_max_plot(), style={'width': '48%'}),
             dcc.Graph(id='result-distribution-pie', figure=generate_result_distribution_pie(), style={'width': '48%'})
