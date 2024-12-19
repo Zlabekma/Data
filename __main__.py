@@ -21,9 +21,9 @@ scope = ["https://spreadsheets.google.com/feeds",
 # Authenticate Google Sheets client
 
 #local
-credentials = ServiceAccountCredentials.from_json_keyfile_name("GOOGLE_SHEETS_KEY.JSON", scope)
+#credentials = ServiceAccountCredentials.from_json_keyfile_name("GOOGLE_SHEETS_KEY.JSON", scope)
 # non local 
-#credentials = ServiceAccountCredentials.from_json_keyfile_name('/etc/secrets/GOOGLE_SHEETS_KEY.JSON', scope)
+credentials = ServiceAccountCredentials.from_json_keyfile_name('/etc/secrets/GOOGLE_SHEETS_KEY.JSON', scope)
 
 client = gspread.authorize(credentials)
 
@@ -193,8 +193,8 @@ def toggle_player_dropdown(filter_value):
         return {'display': 'none'}
 
 
-#if __name__ == "__main__":
-#    app.run_server(host="0.0.0.0", port=int(os.environ.get("PORT", 8080)), debug=True)
+if __name__ == "__main__":
+    app.run_server(host="0.0.0.0", port=int(os.environ.get("PORT", 8080)), debug=True)
 
-if __name__ == '__main__':
-    app.run_server(debug=True)
+#if __name__ == '__main__':
+#    app.run_server(debug=True)
